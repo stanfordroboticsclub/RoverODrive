@@ -19,12 +19,37 @@ print("found an odrive (random)")
 odrive.axis0.requested_state = AXIS_STATE_IDLE
 odrive.axis1.requested_state = AXIS_STATE_IDLE
 
+def clear_errors(odrive):
+    if odrive.axis0.error:
+        print("axis 0", odrive.axis0.error)
+        odrive.axis0.error = 0
+    if odrive.axis1.error:
+        print("axis 1", odrive.axis1.error)
+        odrive.axis1.error = 0
+
+    if odrive.axis0.motor.error:
+        print("motor 0", odrive.axis0.motor.error)
+        odrive.axis0.motor.error = 0
+    if odrive.axis1.motor.error:
+        print("motor 1", odrive.axis1.motor.error)
+        odrive.axis1.motor.error = 0
+
+    if odrive.axis0.encoder.error:
+        print("encoder 0", odrive.axis0.encoder.error)
+        odrive.axis0.encoder.error = 0
+    if odrive.axis1.encoder.error:
+        print("encoder 1", odrive.axis1.encoder.error)
+        odrive.axis1.encoder.error = 0
+
+
 while True:
     try:
         msg = a.get()
         print(msg)
         odom.send([odrive.axis0.encoder.pos_estimate / odrive.axis0.encoder.config.cpr, 
                 - odrive.axis1.encoder.pos_estimate / odrive.axis1.encoder.config.cpr])
+
+        clear_errors(odrive)
 
         if (msg['t'] == 0 and msg['f'] == 0):
             odrive.axis0.requested_state = AXIS_STATE_IDLE

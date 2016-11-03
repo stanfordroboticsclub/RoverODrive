@@ -15,14 +15,12 @@ import time
 if os.geteuid() != 0:
     exit("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
 
-cmd = Subscriber(8830, timeout = 0.3)
+cmd = Subscriber(8830, timeout = 0.5)
 telemetry = Publisher(8810)
 
 # motor 0 is right
 # motor 1 is left
-odrives = [ ['middle' , "207B37883548", [1, 1]],
-            ['front', "207D37A33548",  [-1, 1]],
-            ['back'  , "207B37813548", [-1, 1]]]
+odrives = [ ['single' , "376136493137", [-1, 1]] ]
 
 def clear_errors(odv):
     if odv.axis0.error:
@@ -98,9 +96,9 @@ def run_odrive(name, serial_number, d):
                     # axis 0 (right) is always same sign
                     # axis 1 (left) is always opposite sign
                     odv.axis0.controller.vel_setpoint =  d[0]*( \
-                                msg['f'] + msg['t'])
-                    odv.axis1.controller.vel_setpoint =  d[1]*( \
                                 msg['f'] - msg['t'])
+                    odv.axis1.controller.vel_setpoint =  d[1]*( \
+                                msg['f'] + msg['t'])
                     odv.axis0.watchdog_feed()
                     odv.axis1.watchdog_feed()
 
