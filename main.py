@@ -12,15 +12,16 @@ socket.settimeout(2)
 
 s = struct.Struct('ff')
 
-try:
-    while True:
-        data, addr = sock.recvfrom(1024)
-        left,right = s.unpack(data)
-        print(left,right)
-        # odrv0.axis0.controller.vel_setpoint = left
-        # odrv0.axis1.controller.vel_setpoint = right
-except:
-    raise
-    # odrv0.axis0.controller.vel_setpoint = 0
-    # odrv0.axis1.controller.vel_setpoint = 0
+while True:
+    try:
+            data, addr = sock.recvfrom(1024)
+            left,right = s.unpack(data)
+            print(left,right)
+            # odrv0.axis0.controller.vel_setpoint = left
+            # odrv0.axis1.controller.vel_setpoint = right
+    except:
+        pass
+        # raise
+        # odrv0.axis0.controller.vel_setpoint = 0
+        # odrv0.axis1.controller.vel_setpoint = 0
 

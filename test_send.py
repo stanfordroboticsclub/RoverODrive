@@ -13,6 +13,7 @@ UDP_PORT = 6001
 
 s = struct.Struct('ff')
 
+last_char=" "
 
 while True:
     MESSAGE = s.pack(speed,speed)
