@@ -1,4 +1,7 @@
 
+odrv0.config.brake_resistance = 0
+
+
 odrv0.axis0.motor.config.pole_pairs = 15
 odrv0.axis0.motor.config.resistance_calib_max_voltage = 4
 odrv0.axis0.motor.config.requested_current_range = 25 #Requires config save and reboot
@@ -52,8 +55,13 @@ odrv0.axis1.requested_state = AXIS_STATE_ENCODER_OFFSET_CALIBRATION
 odrv0.axis1.encoder
 odrv0.axis1.encoder.config.pre_calibrated = True
 
+# still looking for good values
+odrv0.axis0.motor.config.current_lim = 25
+odrv0.axis1.motor.config.current_lim = 25
+
 odrv0.save_configuration()
 odrv0.reboot()
+
 
 
 odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
