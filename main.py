@@ -13,7 +13,6 @@ print("found")
 
 middle_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 middle_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-
 front_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 front_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 
@@ -23,10 +22,14 @@ while True:
         print(msg)
         middle_odrive.axis0.controller.vel_setpoint = -(msg.f + msg.t)
         middle_odrive.axis1.controller.vel_setpoint = (msg.f - msg.t)
-        front_odrive.axis0.controller.vel_setpoint = -(msg.f + msg.t)
-        front_odrive.axis1.controller.vel_setpoint = (msg.f - msg.t)
+        front_odrive.axis0.controller.vel_setpoint = (msg.f - msg.t)
+        front_odrive.axis1.controller.vel_setpoint = -(msg.f + msg.t)
     except:
         pass
+        middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
+        middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
+        front_odrive.axis0.requested_state = AXIS_STATE_IDLE
+        front_odrive.axis1.requested_state = AXIS_STATE_IDLE
         middle_odrive.axis0.controller.vel_setpoint = 0
         middle_odrive.axis1.controller.vel_setpoint = 0
         front_odrive.axis0.controller.vel_setpoint = 0
