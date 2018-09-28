@@ -6,22 +6,30 @@ from UDPComms import Subscriber
 
 a = Subscriber("f t", b"ff", 8830)
 
-print("finding an odrive...")
-odrv0 = odrive.find_any()
+print("finding an odrives...")
+middle_odrive = odrive.find_any(serial_number="208037853548")
+front_odrive = odrive.find_any(serial_number="2062376E3548")
 print("found")
 
-odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-odrv0.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+middle_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+middle_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+
+front_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+front_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 
 while True:
     try:
         msg = a.recv()
         print(msg)
-        odrv0.axis0.controller.vel_setpoint = -(msg.f + msg.t)
-        odrv0.axis1.controller.vel_setpoint = (msg.f - msg.t)
+        middle_odrive.axis0.controller.vel_setpoint = -(msg.f + msg.t)
+        middle_odrive.axis1.controller.vel_setpoint = (msg.f - msg.t)
+        front_odrive.axis0.controller.vel_setpoint = -(msg.f + msg.t)
+        front_odrive.axis1.controller.vel_setpoint = (msg.f - msg.t)
     except:
         pass
-        odrv0.axis0.controller.vel_setpoint = 0
-        odrv0.axis1.controller.vel_setpoint = 0
+        middle_odrive.axis0.controller.vel_setpoint = 0
+        middle_odrive.axis1.controller.vel_setpoint = 0
+        front_odrive.axis0.controller.vel_setpoint = 0
+        front_odrive.axis1.controller.vel_setpoint = 0
         raise
 
