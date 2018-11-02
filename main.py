@@ -5,7 +5,7 @@ from odrive.enums import *
 from UDPComms import Subscriber
 import time
 
-a = Subscriber("f t", b"ff", 8830)
+a = Subscriber("f t", b"ff", 8830, timeout = 0.3)
 
 print("finding an odrives...")
 middle_odrive = odrive.find_any(serial_number="208037853548")
@@ -55,7 +55,6 @@ while True:
             back_odrive.axis1.controller.vel_setpoint = (msg.f - msg.t)
             back_odrive.axis0.controller.vel_setpoint = -(msg.f + msg.t)
     except:
-        pass
         middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
         middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
         front_odrive.axis0.requested_state = AXIS_STATE_IDLE
