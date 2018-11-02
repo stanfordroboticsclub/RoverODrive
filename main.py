@@ -3,6 +3,7 @@ import odrive
 from odrive.enums import *
 
 from UDPComms import Subscriber
+import time
 
 a = Subscriber("f t", b"ff", 8830)
 
@@ -18,6 +19,13 @@ front_odrive.axis0.requested_state = AXIS_STATE_IDLE
 front_odrive.axis1.requested_state = AXIS_STATE_IDLE
 back_odrive.axis0.requested_state = AXIS_STATE_IDLE
 back_odrive.axis1.requested_state = AXIS_STATE_IDLE
+
+# this makes sure there are no old messages queued up that can make
+# the rover drive
+first_msg = a.recv()
+start_time = time.time()
+while (time.time() - start_time) < 5:
+    ignore_msg = a.recv()
 
 while True:
     try:
