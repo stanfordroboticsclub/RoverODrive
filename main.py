@@ -5,7 +5,8 @@ from odrive.enums import *
 from UDPComms import Subscriber
 import time
 
-a = Subscriber("f t", b"ff", 8830, timeout = 0.3)
+cmd = Subscriber("f t", b"ff", 8830, timeout = 0.3)
+telemetry = Publisher("bat_voltage F0_cur F1_cur M0_cur M1_cur B0_cur B1_cur", b"f6f", 8810)
 
 print("finding an odrives...")
 middle_odrive = odrive.find_any(serial_number="208037853548")
@@ -22,15 +23,24 @@ back_odrive.axis1.requested_state = AXIS_STATE_IDLE
 
 # this makes sure there are no old messages queued up that can make
 # the rover drive
-first_msg = a.recv()
+first_msg = cmd.recv()
 start_time = time.time()
 while (time.time() - start_time) < 5:
-    ignore_msg = a.recv()
+    ignore_msg = cmd.recv()
 
 while True:
     try:
-        msg = a.recv()
+        msg = cmd.recv()
         print(msg)
+
+        telemetry.send( middle_odrive.vbus_voltage,
+                        front_odrive.axis0.motor.current_control.Iq_measured,
+                        front_odrive.axis1.motor.current_control.Iq_measured,
+                        middle_odrive.axis0.motor.current_control.Iq_measured,
+                        middle_odrive.axis1.motor.current_control.Iq_measured,
+                        back_odrive.axis0.motor.current_control.Iq_measured,
+                        back_odrive.axis1.motor.current_control.Iq_measured)
+
         if (msg.t == 0 and msg.f == 0):
             middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
             middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
