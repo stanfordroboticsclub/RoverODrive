@@ -31,7 +31,7 @@ odrv0.config.brake_resistance = 0
 odrv0.axis0.motor.config.pole_pairs = 15
 odrv0.axis0.motor.config.resistance_calib_max_voltage = 4
 odrv0.axis0.motor.config.requested_current_range = 25 #Requires config save and reboot
-odrv0.axis0.motor.set_current_control_bandwidth(100)
+#odrv0.axis0.motor.set_current_control_bandwidth(100)
 
 odrv0.axis0.encoder.config.mode = 1
 odrv0.axis0.encoder.config.cpr = 90
@@ -48,7 +48,7 @@ odrv0.axis0.controller.config.control_mode = CTRL_MODE_VELOCITY_CONTROL
 odrv0.axis1.motor.config.pole_pairs = 15
 odrv0.axis1.motor.config.resistance_calib_max_voltage = 4
 odrv0.axis1.motor.config.requested_current_range = 25 #Requires config save and reboot
-odrv0.axis1.motor.set_current_control_bandwidth(100)
+#odrv0.axis1.motor.set_current_control_bandwidth(100)
 
 odrv0.axis1.encoder.config.mode = 1
 odrv0.axis1.encoder.config.cpr = 90
@@ -66,19 +66,23 @@ odrv0.save_configuration()
 
 # axis 0
 odrv0.axis0.requested_state = AXIS_STATE_MOTOR_CALIBRATION
+time.sleep(10)
 assert odrv0.axis0.motor.error == 0
 odrv0.axis0.motor.config.pre_calibrated = True
 
 odrv0.axis0.requested_state = AXIS_STATE_ENCODER_OFFSET_CALIBRATION
+time.sleep(10)
 assert odrv0.axis0.encoder.error == 0
 odrv0.axis0.encoder.config.pre_calibrated = True
 
 # axis 1
 odrv0.axis1.requested_state = AXIS_STATE_MOTOR_CALIBRATION
+time.sleep(10)
 assert odrv0.axis1.motor.error == 0
 odrv0.axis1.motor.config.pre_calibrated = True
 
 odrv0.axis1.requested_state = AXIS_STATE_ENCODER_OFFSET_CALIBRATION
+time.sleep(10)
 assert odrv0.axis1.encoder.error == 0
 odrv0.axis1.encoder.config.pre_calibrated = True
 
