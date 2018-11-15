@@ -31,7 +31,7 @@ odrv0.config.brake_resistance = 0
 odrv0.axis0.motor.config.pole_pairs = 15
 odrv0.axis0.motor.config.resistance_calib_max_voltage = 4
 odrv0.axis0.motor.config.requested_current_range = 25 #Requires config save and reboot
-#odrv0.axis0.motor.set_current_control_bandwidth(100)
+odrv0.axis0.motor.set_current_control_bandwidth(100)
 
 odrv0.axis0.encoder.config.mode = 1
 odrv0.axis0.encoder.config.cpr = 90
@@ -48,7 +48,7 @@ odrv0.axis0.controller.config.control_mode = CTRL_MODE_VELOCITY_CONTROL
 odrv0.axis1.motor.config.pole_pairs = 15
 odrv0.axis1.motor.config.resistance_calib_max_voltage = 4
 odrv0.axis1.motor.config.requested_current_range = 25 #Requires config save and reboot
-#odrv0.axis1.motor.set_current_control_bandwidth(100)
+odrv0.axis1.motor.set_current_control_bandwidth(100)
 
 odrv0.axis1.encoder.config.mode = 1
 odrv0.axis1.encoder.config.cpr = 90
@@ -91,7 +91,10 @@ odrv0.axis0.motor.config.current_lim = 25
 odrv0.axis1.motor.config.current_lim = 25
 
 odrv0.save_configuration()
-odrv0.reboot()
+try:
+    odrv0.reboot()
+except:
+    pass
 
 print("Done!")
 exit()
