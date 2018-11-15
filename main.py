@@ -2,7 +2,7 @@
 import odrive
 from odrive.enums import *
 
-from UDPComms import Subscriber
+from UDPComms import Subscriber, Publisher
 import time
 
 cmd = Subscriber("f t", b"ff", 8830, timeout = 0.3)
