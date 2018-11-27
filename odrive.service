@@ -2,7 +2,7 @@
 Description=Odrive service
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/UDP-ODrive/main.py
+ExecStart=/usr/bin/python3 /home/pi/RoverODrive/main.py
 
 [Install]
 WantedBy=multi-user.target
