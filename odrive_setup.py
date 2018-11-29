@@ -4,6 +4,10 @@ import odrive
 from odrive.enums import *
 import time
 
+import os
+if os.geteuid() != 0:
+    exit("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
+
 reply = input("""This script will calibrate an odrive for use.
 It will spin the motors as part of the process so make sure they are 
 free to spin. If multiple odrives are connected it will calibrate a

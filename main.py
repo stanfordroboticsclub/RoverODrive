@@ -5,6 +5,10 @@ from odrive.enums import *
 from UDPComms import Subscriber, Publisher
 import time
 
+import os
+if os.geteuid() != 0:
+    exit("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
+
 cmd = Subscriber("f t", b"ff", 8830, timeout = 0.3)
 telemetry = Publisher("bat_voltage F0_cur F1_cur M0_cur M1_cur B0_cur B1_cur", b"f6f", 8810)
 
