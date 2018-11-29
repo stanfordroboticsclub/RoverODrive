@@ -5,6 +5,10 @@ from odrive.enums import *
 from UDPComms import Subscriber
 import time
 
+import os
+if os.geteuid() != 0:
+    exit("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
+
 a = Subscriber("f t", b"ff", 8830, timeout = 0.3)
 
 print("finding any odrives...")
