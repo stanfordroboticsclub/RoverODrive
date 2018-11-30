@@ -36,8 +36,8 @@ while True:
             odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
             odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 
-            odrive.axis0.controller.vel_setpoint = -(msg.f + msg.t)
-            odrive.axis1.controller.vel_setpoint = (msg.f - msg.t)
+            odrive.axis0.controller.vel_setpoint = (msg.f + msg.t)
+            odrive.axis1.controller.vel_setpoint = -(msg.f - msg.t)
     except:
         odrive.axis0.requested_state = AXIS_STATE_IDLE
         odrive.axis1.requested_state = AXIS_STATE_IDLE
