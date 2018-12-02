@@ -2,7 +2,7 @@
 import odrive
 from odrive.enums import *
 
-from UDPComms import Subscriber, Publisher
+from UDPComms import Subscriber, Publisher, timeout
 import time
 
 import os
@@ -27,8 +27,6 @@ front_odrive.axis0.requested_state = AXIS_STATE_IDLE
 front_odrive.axis1.requested_state = AXIS_STATE_IDLE
 back_odrive.axis0.requested_state = AXIS_STATE_IDLE
 back_odrive.axis1.requested_state = AXIS_STATE_IDLE
-
-time.sleep(3)
 
 while True:
     try:
@@ -66,6 +64,19 @@ while True:
             # back odrive is reversed left to right
             back_odrive.axis1.controller.vel_setpoint = (msg.f - msg.t)
             back_odrive.axis0.controller.vel_setpoint = -(msg.f + msg.t)
+    except timeout:
+        middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
+        middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
+        front_odrive.axis0.requested_state = AXIS_STATE_IDLE
+        front_odrive.axis1.requested_state = AXIS_STATE_IDLE
+        back_odrive.axis0.requested_state = AXIS_STATE_IDLE
+        back_odrive.axis1.requested_state = AXIS_STATE_IDLE
+        middle_odrive.axis0.controller.vel_setpoint = 0
+        middle_odrive.axis1.controller.vel_setpoint = 0
+        front_odrive.axis0.controller.vel_setpoint = 0
+        front_odrive.axis1.controller.vel_setpoint = 0
+        back_odrive.axis0.controller.vel_setpoint = 0
+        back_odrive.axis1.controller.vel_setpoint = 0
     except:
         middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
         middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
