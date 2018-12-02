@@ -28,16 +28,11 @@ front_odrive.axis1.requested_state = AXIS_STATE_IDLE
 back_odrive.axis0.requested_state = AXIS_STATE_IDLE
 back_odrive.axis1.requested_state = AXIS_STATE_IDLE
 
-# this makes sure there are no old messages queued up that can make
-# the rover drive
-first_msg = cmd.recv()
-start_time = time.time()
-while (time.time() - start_time) < 5:
-    ignore_msg = cmd.recv()
+time.sleep(3)
 
 while True:
     try:
-        msg = cmd.recv()
+        msg = cmd.get()
         print(msg)
 
         telemetry.send( middle_odrive.vbus_voltage,

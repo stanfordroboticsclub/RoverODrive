@@ -18,16 +18,11 @@ print("found an odrive (random)")
 odrive.axis0.requested_state = AXIS_STATE_IDLE
 odrive.axis1.requested_state = AXIS_STATE_IDLE
 
-# this makes sure there are no old messages queued up that can make
-# the rover drive
-first_msg = a.recv()
-start_time = time.time()
-while (time.time() - start_time) < 5:
-    ignore_msg = a.recv()
+time.sleep(3)
 
 while True:
     try:
-        msg = a.recv()
+        msg = a.get()
         print(msg)
         if (msg.t == 0 and msg.f == 0):
             odrive.axis0.requested_state = AXIS_STATE_IDLE
