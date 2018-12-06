@@ -2,7 +2,7 @@
 import odrive
 from odrive.enums import *
 
-from UDPComms import Subscriber
+from UDPComms import Subscriber, timeout
 import time
 
 import os
@@ -18,10 +18,6 @@ print("found an odrive (random)")
 odrive.axis0.requested_state = AXIS_STATE_IDLE
 odrive.axis1.requested_state = AXIS_STATE_IDLE
 
-# this makes sure there are no old messages queued up that can make
-# the rover drive
-time.sleep(3)
-
 while True:
     try:
         msg = a.get()
@@ -35,6 +31,11 @@ while True:
 
             odrive.axis0.controller.vel_setpoint = (msg.f + msg.t)
             odrive.axis1.controller.vel_setpoint = -(msg.f - msg.t)
+    except timeout:
+        odrive.axis0.requested_state = AXIS_STATE_IDLE
+        odrive.axis1.requested_state = AXIS_STATE_IDLE
+        odrive.axis0.controller.vel_setpoint = 0
+        odrive.axis1.controller.vel_setpoint = 0
     except:
         odrive.axis0.requested_state = AXIS_STATE_IDLE
         odrive.axis1.requested_state = AXIS_STATE_IDLE
