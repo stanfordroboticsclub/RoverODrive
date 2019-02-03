@@ -77,9 +77,6 @@ odrv0.axis1.controller.config.vel_limit = 1000
 odrv0.axis1.controller.config.control_mode = CTRL_MODE_VELOCITY_CONTROL
 
 
-odrv0.save_configuration()
-
-
 # axis 0
 print("Motor 0")
 odrv0.axis0.requested_state = AXIS_STATE_MOTOR_CALIBRATION
@@ -111,6 +108,8 @@ odrv0.axis0.motor.config.current_lim = 25
 odrv0.axis1.motor.config.current_lim = 25
 
 odrv0.save_configuration()
+
+time.sleep(3)
 try:
     odrv0.reboot()
 except:

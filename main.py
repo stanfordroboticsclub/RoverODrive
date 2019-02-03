@@ -13,18 +13,45 @@ cmd = Subscriber(8830, timeout = 0.3)
 # telemetry = Publisher(8810)
 
 print("finding an odrives...")
-middle_odrive = odrive.find_any(serial_number="208037853548")
-print("found middle odrive")
-front_odrive = odrive.find_any(serial_number="376136493137")
+
+front_odrive = odrive.find_any(serial_number="206B35833948")
 print("found front odrive")
-back_odrive = odrive.find_any(serial_number="208037843548")
+middle_odrive = odrive.find_any(serial_number="206C35733948")
+print("found middle odrive")
+back_odrive = odrive.find_any(serial_number="207D35903948")
 print("found back odrive")
+
 print("found all odrives")
 
-middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
-middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
+def clear_errors(odrive):
+    if odrive.axis0.error:
+        print("axis 0", odrive.axis0.error)
+        odrive.axis0.error = 0
+    if odrive.axis1.error:
+        print("axis 1", odrive.axis1.error)
+        odrive.axis1.error = 0
+
+    if odrive.axis0.motor.error:
+        print("motor 0", odrive.axis0.motor.error)
+        odrive.axis0.motor.error = 0
+    if odrive.axis1.motor.error:
+        print("motor 1", odrive.axis1.motor.error)
+        odrive.axis1.motor.error = 0
+
+    if odrive.axis0.encoder.error:
+        print("encoder 0", odrive.axis0.encoder.error)
+        odrive.axis0.encoder.error = 0
+    if odrive.axis1.encoder.error:
+        print("encoder 1", odrive.axis1.encoder.error)
+        odrive.axis1.encoder.error = 0
+
+def state_idle(odrive):
+    pass
+
 front_odrive.axis0.requested_state = AXIS_STATE_IDLE
 front_odrive.axis1.requested_state = AXIS_STATE_IDLE
+middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
+middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
 back_odrive.axis0.requested_state = AXIS_STATE_IDLE
 back_odrive.axis1.requested_state = AXIS_STATE_IDLE
 
@@ -41,6 +68,10 @@ while True:
         #                 back_odrive.axis0.motor.current_control.Iq_measured,
         #                 back_odrive.axis1.motor.current_control.Iq_measured)
 
+        clear_errors(front_odrive)
+        clear_errors(middle_odrive)
+        clear_errors(back_odrive)
+
         if (msg['t'] == 0 and msg['f'] == 0):
             middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
             middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
@@ -56,14 +87,15 @@ while True:
             back_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
             back_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 
-            middle_odrive.axis0.controller.vel_setpoint = -(msg['f'] + msg['t'])
-            middle_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
             front_odrive.axis0.controller.vel_setpoint = (-msg['f'] - msg['t'])
             front_odrive.axis1.controller.vel_setpoint = -(-msg['f'] + msg['t'])
+            middle_odrive.axis0.controller.vel_setpoint = -(msg['f'] + msg['t'])
+            middle_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
 
             # back odrive is reversed left to right
             back_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
             back_odrive.axis0.controller.vel_setpoint = -(msg['f'] + msg['t'])
+
     except timeout:
         middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
         middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
