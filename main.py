@@ -10,7 +10,7 @@ if os.geteuid() != 0:
     exit("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
 
 cmd = Subscriber(8830, timeout = 0.3)
-# telemetry = Publisher(8810)
+telemetry = Publisher(8810)
 
 print("finding an odrives...")
 
@@ -45,40 +45,45 @@ def clear_errors(odrive):
         print("encoder 1", odrive.axis1.encoder.error)
         odrive.axis1.encoder.error = 0
 
-def state_idle(odrive):
-    pass
+def send_state(odrive, state):
+        try:
+            odrive.axis0.requested_state = AXIS_STATE_IDLE
+        except:
+            pass
+        try:
+            odrive.axis1.requested_state = AXIS_STATE_IDLE
+        except:
+            pass
+    
 
-front_odrive.axis0.requested_state = AXIS_STATE_IDLE
-front_odrive.axis1.requested_state = AXIS_STATE_IDLE
-middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
-middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
-back_odrive.axis0.requested_state = AXIS_STATE_IDLE
-back_odrive.axis1.requested_state = AXIS_STATE_IDLE
+send_state(front_odrive, AXIS_STATE_IDLE)
+send_state(middle_odrive, AXIS_STATE_IDLE)
+send_state(back_odrive, AXIS_STATE_IDLE)
 
 while True:
     try:
         msg = cmd.get()
         print(msg)
 
-        # telemetry.send( middle_odrive.vbus_voltage,
-        #                 front_odrive.axis0.motor.current_control.Iq_measured,
-        #                 front_odrive.axis1.motor.current_control.Iq_measured,
-        #                 middle_odrive.axis0.motor.current_control.Iq_measured,
-        #                 middle_odrive.axis1.motor.current_control.Iq_measured,
-        #                 back_odrive.axis0.motor.current_control.Iq_measured,
-        #                 back_odrive.axis1.motor.current_control.Iq_measured)
+        try:
+            telemetry.send( middle_odrive.vbus_voltage,
+                        front_odrive.axis0.motor.current_control.Iq_measured,
+                        front_odrive.axis1.motor.current_control.Iq_measured,
+                        middle_odrive.axis0.motor.current_control.Iq_measured,
+                        middle_odrive.axis1.motor.current_control.Iq_measured,
+                        back_odrive.axis0.motor.current_control.Iq_measured,
+                        back_odrive.axis1.motor.current_control.Iq_measured)
+        except:
+            pass
 
         clear_errors(front_odrive)
         clear_errors(middle_odrive)
         clear_errors(back_odrive)
 
         if (msg['t'] == 0 and msg['f'] == 0):
-            middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
-            middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
-            front_odrive.axis0.requested_state = AXIS_STATE_IDLE
-            front_odrive.axis1.requested_state = AXIS_STATE_IDLE
-            back_odrive.axis0.requested_state = AXIS_STATE_IDLE
-            back_odrive.axis1.requested_state = AXIS_STATE_IDLE
+            send_state(front_odrive, AXIS_STATE_IDLE)
+            send_state(middle_odrive, AXIS_STATE_IDLE)
+            send_state(back_odrive, AXIS_STATE_IDLE)
         else:
             middle_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
             middle_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
@@ -97,12 +102,10 @@ while True:
             back_odrive.axis0.controller.vel_setpoint = -(msg['f'] + msg['t'])
 
     except timeout:
-        middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
-        middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
-        front_odrive.axis0.requested_state = AXIS_STATE_IDLE
-        front_odrive.axis1.requested_state = AXIS_STATE_IDLE
-        back_odrive.axis0.requested_state = AXIS_STATE_IDLE
-        back_odrive.axis1.requested_state = AXIS_STATE_IDLE
+        print("Sending safe command")
+        send_state(front_odrive, AXIS_STATE_IDLE)
+        send_state(middle_odrive, AXIS_STATE_IDLE)
+        send_state(back_odrive, AXIS_STATE_IDLE)
         middle_odrive.axis0.controller.vel_setpoint = 0
         middle_odrive.axis1.controller.vel_setpoint = 0
         front_odrive.axis0.controller.vel_setpoint = 0
@@ -110,12 +113,10 @@ while True:
         back_odrive.axis0.controller.vel_setpoint = 0
         back_odrive.axis1.controller.vel_setpoint = 0
     except:
-        middle_odrive.axis0.requested_state = AXIS_STATE_IDLE
-        middle_odrive.axis1.requested_state = AXIS_STATE_IDLE
-        front_odrive.axis0.requested_state = AXIS_STATE_IDLE
-        front_odrive.axis1.requested_state = AXIS_STATE_IDLE
-        back_odrive.axis0.requested_state = AXIS_STATE_IDLE
-        back_odrive.axis1.requested_state = AXIS_STATE_IDLE
+        print("Shutting down")
+        send_state(front_odrive, AXIS_STATE_IDLE)
+        send_state(middle_odrive, AXIS_STATE_IDLE)
+        send_state(back_odrive, AXIS_STATE_IDLE)
         middle_odrive.axis0.controller.vel_setpoint = 0
         middle_odrive.axis1.controller.vel_setpoint = 0
         front_odrive.axis0.controller.vel_setpoint = 0
