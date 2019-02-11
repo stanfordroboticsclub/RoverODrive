@@ -28,6 +28,8 @@ time.sleep(3)
 
 # this is important so the odrive knows it can't dump
 # energy into the non existent brake resistor
+#odrv0.erase_configuration() 
+
 odrv0.config.brake_resistance = 0
 
 # configure axis 0
@@ -81,26 +83,26 @@ odrv0.axis1.controller.config.control_mode = CTRL_MODE_VELOCITY_CONTROL
 print("Motor 0")
 odrv0.axis0.requested_state = AXIS_STATE_MOTOR_CALIBRATION
 time.sleep(10)
-assert odrv0.axis0.motor.error == 0
+assert odrv0.axis0.motor.error == 0, odrv0.axis0.motor.error
 odrv0.axis0.motor.config.pre_calibrated = True
 
 print("Encoder 0")
 odrv0.axis0.requested_state = AXIS_STATE_ENCODER_OFFSET_CALIBRATION
 time.sleep(10)
-assert odrv0.axis0.encoder.error == 0
+assert odrv0.axis0.encoder.error == 0, odrv0.axis0.encoder.error
 odrv0.axis0.encoder.config.pre_calibrated = True
 
 # axis 1
 print("Motor 1")
 odrv0.axis1.requested_state = AXIS_STATE_MOTOR_CALIBRATION
 time.sleep(10)
-assert odrv0.axis1.motor.error == 0
+assert odrv0.axis1.motor.error == 0, odrv0.axis1.motor.error
 odrv0.axis1.motor.config.pre_calibrated = True
 
 print("Encoder 1")
 odrv0.axis1.requested_state = AXIS_STATE_ENCODER_OFFSET_CALIBRATION
 time.sleep(10)
-assert odrv0.axis1.encoder.error == 0
+assert odrv0.axis1.encoder.error == 0, odrv0.axis1.encoder.error
 odrv0.axis1.encoder.config.pre_calibrated = True
 
 # still looking for good values

@@ -66,13 +66,13 @@ while True:
         print(msg)
 
         try:
-            telemetry.send( middle_odrive.vbus_voltage,
+            telemetry.send( [middle_odrive.vbus_voltage,
                         front_odrive.axis0.motor.current_control.Iq_measured,
                         front_odrive.axis1.motor.current_control.Iq_measured,
                         middle_odrive.axis0.motor.current_control.Iq_measured,
                         middle_odrive.axis1.motor.current_control.Iq_measured,
                         back_odrive.axis0.motor.current_control.Iq_measured,
-                        back_odrive.axis1.motor.current_control.Iq_measured)
+                        back_odrive.axis1.motor.current_control.Iq_measured] )
         except:
             pass
 
@@ -94,8 +94,8 @@ while True:
 
             front_odrive.axis0.controller.vel_setpoint = (-msg['f'] - msg['t'])
             front_odrive.axis1.controller.vel_setpoint = -(-msg['f'] + msg['t'])
-            middle_odrive.axis0.controller.vel_setpoint = -(msg['f'] + msg['t'])
-            middle_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
+            middle_odrive.axis0.controller.vel_setpoint = (msg['f'] + msg['t'])
+            middle_odrive.axis1.controller.vel_setpoint = -(msg['f'] - msg['t'])
 
             # back odrive is reversed left to right
             back_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
