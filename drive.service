@@ -1,8 +1,9 @@
 [Unit]
-Description=Odrive service
+Description=Pub: 8830 - target vel; Pub - 8810 drivebase telemetry
 
 [Service]
 ExecStart=/usr/bin/python3 /home/pi/RoverODrive/main.py
+StandardOutput=syslog
 Restart=always
 RestartSec=5
 
