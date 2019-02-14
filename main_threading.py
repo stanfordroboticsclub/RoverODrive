@@ -23,26 +23,26 @@ telemetry = Publisher(8810)
 odrives = [ ['right' , "206039864D4D", {"y": [-1, -1], "x": [-1,  1], "t": [-1, -1]} ], 
             ['left'  , "2071396A4D4D", {"y": [ 1,  1], "x": [-1,  1], "t": [-1, -1]} ] ]
 
-def clear_errors(odv):
+def clear_errors(odv, name):
     if odv.axis0.error:
-        print("axis 0", odv.axis0.error)
+        print(name, "axis 0", odv.axis0.error)
         odv.axis0.error = 0
     if odv.axis1.error:
-        print("axis 1", odv.axis1.error)
+        print(name, "axis 1", odv.axis1.error)
         odv.axis1.error = 0
 
     if odv.axis0.motor.error:
-        print("motor 0", odv.axis0.motor.error)
+        print(name, "motor 0", odv.axis0.motor.error)
         odv.axis0.motor.error = 0
     if odv.axis1.motor.error:
-        print("motor 1", odv.axis1.motor.error)
+        print(name, "motor 1", odv.axis1.motor.error)
         odv.axis1.motor.error = 0
 
     if odv.axis0.encoder.error:
-        print("encoder 0", odv.axis0.encoder.error)
+        print(name, "encoder 0", odv.axis0.encoder.error)
         odv.axis0.encoder.error = 0
     if odv.axis1.encoder.error:
-        print("encoder 1", odv.axis1.encoder.error)
+        print(name, "encoder 1", odv.axis1.encoder.error)
         odv.axis1.encoder.error = 0
 
 def send_state(odv, state):
@@ -87,7 +87,7 @@ def run_odrive(name, serial_number, d):
 
             # Write to Odrives block
             try:
-                clear_errors(odv)
+                clear_errors(odv, name)
                 if lostConnection:
                 # if msg['f'] == 0 and msg['t'] == 0:
                     atomic_print("Timeout sending safe")
