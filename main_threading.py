@@ -18,11 +18,10 @@ if os.geteuid() != 0:
 cmd = Subscriber(8830, timeout = 0.3)
 telemetry = Publisher(8810)
 
-# motor 0 is right
-# motor 1 is left
-odrives = [ ['middle' , "207B37883548", [1, 1]],
-            ['front', "207D37A33548",  [-1, 1]],
-            ['back'  , "207B37813548", [-1, 1]]]
+# motor 0 is back
+# motor 1 is front
+odrives = [ ['right' , "206039864D4D", {"y": [-1, -1], "x": [-1,  1], "t": [-1, -1]} ], 
+            ['left'  , "2071396A4D4D", {"y": [ 1,  1], "x": [-1,  1], "t": [-1, -1]} ] ]
 
 def clear_errors(odv):
     if odv.axis0.error:
@@ -82,7 +81,7 @@ def run_odrive(name, serial_number, d):
                 lostConnection = False
             except timeout:
                 lostConnection = True
-                msg = {'t':0, 'f':0}
+                msg = {'t':0, 'x':0, "y":0}
             finally:
                 UDPLock.release()
 
@@ -97,10 +96,9 @@ def run_odrive(name, serial_number, d):
                     send_state(odv, AXIS_STATE_CLOSED_LOOP_CONTROL)
                     # axis 0 (right) is always same sign
                     # axis 1 (left) is always opposite sign
-                    odv.axis0.controller.vel_setpoint =  d[0]*( \
-                                msg['f'] + msg['t'])
-                    odv.axis1.controller.vel_setpoint =  d[1]*( \
-                                msg['f'] - msg['t'])
+                    
+                    odv.axis0.controller.vel_setpoint = sum(msg[a] * d[a][0] for a in ['x', 't', 'y'])
+                    odv.axis1.controller.vel_setpoint = sum(msg[a] * d[a][1] for a in ['x', 't', 'y'])
                     odv.axis0.watchdog_feed()
                     odv.axis1.watchdog_feed()
 
