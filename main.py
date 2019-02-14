@@ -95,7 +95,7 @@ while True:
             front_odrive.axis0.controller.vel_setpoint = (-msg['f'] - msg['t'])
             front_odrive.axis1.controller.vel_setpoint = -(-msg['f'] + msg['t'])
             middle_odrive.axis0.controller.vel_setpoint = (msg['f'] + msg['t'])
-            middle_odrive.axis1.controller.vel_setpoint = -(msg['f'] - msg['t'])
+            middle_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
 
             # back odrive is reversed left to right
             back_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
