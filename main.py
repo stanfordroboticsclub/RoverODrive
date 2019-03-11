@@ -113,10 +113,10 @@ while True:
         back_odrive.axis0.controller.vel_setpoint = 0
         back_odrive.axis1.controller.vel_setpoint = 0
     except:
-        print("Shutting down")
-        send_state(front_odrive, AXIS_STATE_IDLE)
-        send_state(middle_odrive, AXIS_STATE_IDLE)
-        send_state(back_odrive, AXIS_STATE_IDLE)
+        print("shutting down")
+        send_state(front_odrive, axis_state_idle)
+        send_state(middle_odrive, axis_state_idle)
+        send_state(back_odrive, axis_state_idle)
         middle_odrive.axis0.controller.vel_setpoint = 0
         middle_odrive.axis1.controller.vel_setpoint = 0
         front_odrive.axis0.controller.vel_setpoint = 0
@@ -124,4 +124,15 @@ while True:
         back_odrive.axis0.controller.vel_setpoint = 0
         back_odrive.axis1.controller.vel_setpoint = 0
         raise
+    finally:
+        print("Fianlly shutting down")
+        send_state(front_odrive, axis_state_idle)
+        send_state(middle_odrive, axis_state_idle)
+        send_state(back_odrive, axis_state_idle)
+        middle_odrive.axis0.controller.vel_setpoint = 0
+        middle_odrive.axis1.controller.vel_setpoint = 0
+        front_odrive.axis0.controller.vel_setpoint = 0
+        front_odrive.axis1.controller.vel_setpoint = 0
+        back_odrive.axis0.controller.vel_setpoint = 0
+        back_odrive.axis1.controller.vel_setpoint = 0
 
