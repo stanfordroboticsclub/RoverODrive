@@ -24,7 +24,29 @@ else:
 
 odrv0 = odrive.find_any()
 print("Found ODrive", odrv0.serial_number)
-time.sleep(3)
+time.sleep(1)
+
+
+odrv0.erase_configuration()
+odrv0.save_configuration()
+
+time.sleep(2)
+try:
+    odrv0.reboot()
+except:
+    pass
+
+odrv0 = odrive.find_any()
+print("Found ODrive", odrv0.serial_number)
+time.sleep(2)
+
+
+ready = input("Ready to spin?")
+if ready != "Y":
+    print("Aborting...")
+    exit()
+else:
+    print("Starting spin")
 
 # this is important so the odrive knows it can't dump
 # energy into the non existent brake resistor
