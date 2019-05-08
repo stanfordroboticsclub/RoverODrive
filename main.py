@@ -23,6 +23,7 @@ print("found back odrive")
 
 print("found all odrives")
 
+
 def clear_errors(odrive):
     if odrive.axis0.error:
         print("axis 0", odrive.axis0.error)
@@ -60,6 +61,17 @@ send_state(front_odrive, AXIS_STATE_IDLE)
 send_state(middle_odrive, AXIS_STATE_IDLE)
 send_state(back_odrive, AXIS_STATE_IDLE)
 
+#v_vain = .05
+#v_int_gain = .1
+#odrive_array = [front_odrive,middle_odrive,back_odrive]
+#for odrive in odrive_array:
+front_odrive.axis0.controller.config.vel_gain = .2
+front_odrive.axis1.controller.config.vel_gain = .2
+middle_odrive.axis0.controller.config.vel_gain = .2
+middle_odrive.axis1.controller.config.vel_gain = .2
+back_odrive.axis0.controller.config.vel_gain = .2
+back_odrive.axis1.controller.config.vel_gain = .2
+#print front_odrive.axis0.controller.config
 while True:
     try:
         msg = cmd.get()
@@ -92,9 +104,9 @@ while True:
             back_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
             back_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 
-            front_odrive.axis0.controller.vel_setpoint = (-msg['f'] - msg['t'])
+            front_odrive.axis0.controller.vel_setpoint = -(-msg['f'] - msg['t'])
             front_odrive.axis1.controller.vel_setpoint = -(-msg['f'] + msg['t'])
-            middle_odrive.axis0.controller.vel_setpoint = (msg['f'] + msg['t'])
+            middle_odrive.axis0.controller.vel_setpoint = -(msg['f'] + msg['t'])
             middle_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
 
             # back odrive is reversed left to right
@@ -114,9 +126,9 @@ while True:
         back_odrive.axis1.controller.vel_setpoint = 0
     except:
         print("shutting down")
-        send_state(front_odrive, axis_state_idle)
-        send_state(middle_odrive, axis_state_idle)
-        send_state(back_odrive, axis_state_idle)
+        send_state(front_odrive, AXIS_STATE_IDLE)
+        send_state(middle_odrive, AXIS_STATE_IDLE)
+        send_state(back_odrive, AXIS_STATE_IDLE)
         middle_odrive.axis0.controller.vel_setpoint = 0
         middle_odrive.axis1.controller.vel_setpoint = 0
         front_odrive.axis0.controller.vel_setpoint = 0
@@ -124,15 +136,17 @@ while True:
         back_odrive.axis0.controller.vel_setpoint = 0
         back_odrive.axis1.controller.vel_setpoint = 0
         raise
-    finally:
-        print("Fianlly shutting down")
-        send_state(front_odrive, axis_state_idle)
-        send_state(middle_odrive, axis_state_idle)
-        send_state(back_odrive, axis_state_idle)
-        middle_odrive.axis0.controller.vel_setpoint = 0
-        middle_odrive.axis1.controller.vel_setpoint = 0
-        front_odrive.axis0.controller.vel_setpoint = 0
-        front_odrive.axis1.controller.vel_setpoint = 0
-        back_odrive.axis0.controller.vel_setpoint = 0
-        back_odrive.axis1.controller.vel_setpoint = 0
+
+
+#    finally:
+#        print("Fianlly shutting down")
+#        send_state(front_odrive, AXIS_STATE_IDLE)
+#        send_state(middle_odrive, AXIS_STATE_IDLE)
+#        send_state(back_odrive, AXIS_STATE_IDLE)
+#        middle_odrive.axis0.controller.vel_setpoint = 0
+#        middle_odrive.axis1.controller.vel_setpoint = 0
+#        front_odrive.axis0.controller.vel_setpoint = 0
+#        front_odrive.axis1.controller.vel_setpoint = 0
+#        back_odrive.axis0.controller.vel_setpoint = 0
+#        back_odrive.axis1.controller.vel_setpoint = 0
 

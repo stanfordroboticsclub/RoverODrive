@@ -23,22 +23,6 @@ print("found back odrive")
 
 print("found all odrives")
 
-#Modify gains
-#odrv0.axis0.controller.config.vel_limit = 1000
-#odrv0.axis0.controller.config.control_mode = CTRL_MODE_VELOCITY_CONTROL
-#odrv0.axis1.controller.config.pos_gain = 1
-odrive_array = [front_odrive, middle_odrive, back_odrive]
-
-v_gain = .05
-v_int_gain = .1
-for odrive in odrive_array:
-    odrive.axis0.controller.config.vel_gain = v_gain
-    odrive.axis0.controller.config.vel_integrator_gain = v_int_gain
-    odrive.axis1.controller.config.vel_gain = v_gain
-    odrive.axis1.controller.config.vel_integrator_gain = v_int_gain
-
-    
-#def explore
     
 def clear_errors(odrive):
     if odrive.axis0.error:
@@ -76,6 +60,33 @@ def send_state(odrive, state):
 send_state(front_odrive, AXIS_STATE_IDLE)
 send_state(middle_odrive, AXIS_STATE_IDLE)
 send_state(back_odrive, AXIS_STATE_IDLE)
+
+
+#Modify gains
+#odrv0.axis0.controller.config.vel_limit = 1000
+#odrv0.axis0.controller.config.control_mode = CTRL_MODE_VELOCITY_CONTROL
+#odrv0.axis1.controller.config.pos_gain = 1
+#odrive_array = [front_odrive, middle_odrive, back_odrive]
+
+#v_gain = .05
+#v_int_gain = .1
+#for odrive in odrive_array:
+#    odrive.axis0.controller.config.vel_gain = .15
+#    odrive.axis0.controller.config.vel_integrator_gain = v_int_gain
+#    odrive.axis1.controller.config.vel_gain = .15
+#    odrive.axis1.controller.config.vel_integrator_gain = v_int_gain
+
+front_odrive.axis0.controller.config.vel_gain = .15
+front_odrive.axis1.controller.config.vel_gain = .15
+    
+middle_odrive.axis0.controller.config.vel_gain = .15
+middle_odrive.axis1.controller.config.vel_gain = .15
+    
+back_odrive.axis0.controller.config.vel_gain = .15
+back_odrive.axis1.controller.config.vel_gain = .15
+    
+#def explore
+
 
 while True:
     try:
