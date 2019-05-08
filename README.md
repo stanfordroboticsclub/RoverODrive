@@ -15,5 +15,6 @@ Files
 ------
 
 `main.py` - Drives 3 ODrives based on commands published on port 8830. Also publishes telemetry
+`main_c.py` - Experimental edition of main. Change gains and hopefully add some intelligent control of current dedication
 `single.py` - Drives a single ODrive based on commands published on port 8830 
 `odrive_setup.y` - Sets up an fresh ODrive to be used with the Hub motors
