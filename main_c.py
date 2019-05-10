@@ -62,20 +62,6 @@ send_state(middle_odrive, AXIS_STATE_IDLE)
 send_state(back_odrive, AXIS_STATE_IDLE)
 
 
-#Modify gains
-#odrv0.axis0.controller.config.vel_limit = 1000
-#odrv0.axis0.controller.config.control_mode = CTRL_MODE_VELOCITY_CONTROL
-#odrv0.axis1.controller.config.pos_gain = 1
-#odrive_array = [front_odrive, middle_odrive, back_odrive]
-
-#v_gain = .05
-#v_int_gain = .1
-#for odrive in odrive_array:
-#    odrive.axis0.controller.config.vel_gain = .15
-#    odrive.axis0.controller.config.vel_integrator_gain = v_int_gain
-#    odrive.axis1.controller.config.vel_gain = .15
-#    odrive.axis1.controller.config.vel_integrator_gain = v_int_gain
-
 front_odrive.axis0.controller.config.vel_gain = .15
 front_odrive.axis1.controller.config.vel_gain = .15
     
@@ -86,7 +72,8 @@ back_odrive.axis0.controller.config.vel_gain = .15
 back_odrive.axis1.controller.config.vel_gain = .15
     
 #def explore
-
+current_distribution = [.1,.1,.2,.2,.2,.2]
+total_current = 100
 
 while True:
     try:
@@ -113,21 +100,30 @@ while True:
             send_state(middle_odrive, AXIS_STATE_IDLE)
             send_state(back_odrive, AXIS_STATE_IDLE)
         else:
-            middle_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-            middle_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-            front_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-            front_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-            back_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-            back_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-
-            front_odrive.axis0.controller.vel_setpoint = (-msg['f'] - msg['t'])
-            front_odrive.axis1.controller.vel_setpoint = -(-msg['f'] + msg['t'])
-            middle_odrive.axis0.controller.vel_setpoint = (msg['f'] + msg['t'])
-            middle_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
+            middle_odrive.axis0.requested_state = CTRL_MODE_CURRENT_CONTROL
+            middle_odrive.axis1.requested_state = CTRL_MODE_CURRENT_CONTROL
+            front_odrive.axis0.requested_state = CTRL_MODE_CURRENT_CONTROL
+            front_odrive.axis1.requested_state = CTRL_MODE_CURRENT_CONTROL
+            back_odrive.axis0.requested_state = CTRL_MODE_CURRENT_CONTROL
+            back_odrive.axis1.requested_state = CTRL_MODE_CURRENT_CONTROL
+            
+            if(msg['power_mid']):
+                current_distribution = [0,0,.4,.4,.1,.1]
+                front_odrive.axis0.requested_state = AXIS_STATE_IDLE
+                front_odrive.axis1.requested_state = AXIS_STATE_IDLE
+            else if(msg['power_back']):
+                current_distrdibution = [.05,.05,.15,.15,.3,.3]
+            
+            alloted_current = total_current * current_distribution
+            
+            front_odrive.axis0.controller.vel_setpoint = alloted_current[0]*(-msg['f'] - msg['t'])
+            front_odrive.axis1.controller.vel_setpoint = -alloted_current[1]*(-msg['f'] + msg['t'])
+            middle_odrive.axis0.controller.vel_setpoint = alloted_current[2]*(msg['f'] + msg['t'])
+            middle_odrive.axis1.controller.vel_setpoint = alloted_current[3]*(msg['f'] - msg['t'])
 
             # back odrive is reversed left to right
-            back_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
-            back_odrive.axis0.controller.vel_setpoint = -(msg['f'] + msg['t'])
+            back_odrive.axis1.controller.vel_setpoint = alloted_current[4]*(msg['f'] - msg['t'])
+            back_odrive.axis0.controller.vel_setpoint = -alloted_current[5]*(msg['f'] + msg['t'])
 
     except timeout:
         print("Sending safe command")
