@@ -14,9 +14,9 @@ telemetry = Publisher(8810)
 
 print("finding an odrives...")
 
-front_odrive = odrive.find_any(serial_number="206230804648")
+middle_odrive = odrive.find_any(serial_number="206230804648")
 print("found front odrive")
-middle_odrive = odrive.find_any(serial_number="206C35733948")
+front_odrive = odrive.find_any(serial_number="206C35733948")
 print("found middle odrive")
 back_odrive = odrive.find_any(serial_number="207D35903948")
 print("found back odrive")
