@@ -3,6 +3,7 @@
 import odrive
 from odrive.enums import *
 import time
+import sys
 
 import os
 if os.geteuid() != 0:
@@ -11,9 +12,17 @@ if os.geteuid() != 0:
 reply = input("""This script will calibrate an odrive for use.
 It will spin the motors as part of the process so make sure they are 
 free to spin. If multiple odrives are connected it will calibrate a
-random one so keep that in mind.
+random one so keep that in mind. You can calibrate a specific odrive by
+supplying its hex serial number as the first argument
 
 Do you want to proceed? [Y/n]""")
+
+
+def find_odrive():
+    if len(sys.argv) <= 1:
+        return odrive.find_any()
+    else:
+        return odrive.find_any(serial_number=sys.argv[1])
 
 
 if reply != "Y":
@@ -22,7 +31,7 @@ if reply != "Y":
 else:
     print("Starting setup")
 
-odrv0 = odrive.find_any()
+odrv0 = find_odrive()
 print("Found ODrive", odrv0.serial_number)
 time.sleep(1)
 
@@ -36,7 +45,7 @@ try:
 except:
     pass
 
-odrv0 = odrive.find_any()
+odrv0 = find_odrive()
 print("Found ODrive", odrv0.serial_number)
 time.sleep(2)
 
