@@ -104,10 +104,10 @@ while True:
             back_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
             back_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
 
-            front_odrive.axis0.controller.vel_setpoint = -(-msg['f'] - msg['t'])
-            front_odrive.axis1.controller.vel_setpoint = -(-msg['f'] + msg['t'])
-            middle_odrive.axis0.controller.vel_setpoint = -(msg['f'] + msg['t'])
-            middle_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
+            middle_odrive.axis0.controller.vel_setpoint = -(-msg['f'] - msg['t'])
+            middle_odrive.axis1.controller.vel_setpoint = -(-msg['f'] + msg['t'])
+            front_odrive.axis0.controller.vel_setpoint = -(msg['f'] + msg['t'])
+            front_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
 
             # back odrive is reversed left to right
             back_odrive.axis1.controller.vel_setpoint = (msg['f'] - msg['t'])
