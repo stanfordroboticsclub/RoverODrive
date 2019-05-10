@@ -72,7 +72,7 @@ back_odrive.axis0.controller.config.vel_gain = .15
 back_odrive.axis1.controller.config.vel_gain = .15
     
 #def explore
-current_distribution = [.1,.1,.2,.2,.2,.2]
+current_distribution = [.16,.16,.16,.16,.16,.16]
 total_current = 100
 
 while True:
@@ -112,9 +112,18 @@ while True:
                 front_odrive.axis0.requested_state = AXIS_STATE_IDLE
                 front_odrive.axis1.requested_state = AXIS_STATE_IDLE
             else if(msg['power_back']):
-                current_distrdibution = [.05,.05,.15,.15,.3,.3]
+                current_distribution = [.05,.05,.15,.15,.3,.3]
+            else if(msg['turn']):
+                current_distribution = [.1,.1,.3,.3,.1,.1]
+            else:
+                current_distribution = [.16,.16,.16,.16,.16,.16]
             
             alloted_current = total_current * current_distribution
+            
+            if(abs(msg['f'])+abs(msg['t']) > 1):
+                scaling_factor = abs(msg['f'])+abs(msg['t'])
+                msg['f'] = msg['f']/scaling_factor
+                msg['t'] = msg['t']/scaling_factor
             
             front_odrive.axis0.controller.vel_setpoint = alloted_current[0]*(-msg['f'] - msg['t'])
             front_odrive.axis1.controller.vel_setpoint = -alloted_current[1]*(-msg['f'] + msg['t'])
