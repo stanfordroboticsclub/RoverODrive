@@ -14,9 +14,9 @@ telemetry = Publisher(8810)
 
 print("finding an odrives...")
 
-front_odrive = odrive.find_any(serial_number="206B35833948")
-print("found front odrive")
-middle_odrive = odrive.find_any(serial_number="206C35733948")
+middle_odrive = odrive.find_any(serial_number="206230804648")
+print("found middle odrive")
+front_odrive = odrive.find_any(serial_number="206C35733948")
 print("found middle odrive")
 back_odrive = odrive.find_any(serial_number="207D35903948")
 print("found back odrive")
@@ -73,7 +73,7 @@ back_odrive.axis1.controller.config.vel_gain = .15
     
 #def explore
 current_distribution = [.16,.16,.16,.16,.16,.16]
-total_current = 100
+total_current = 80
 
 while True:
     try:
@@ -100,39 +100,44 @@ while True:
             send_state(middle_odrive, AXIS_STATE_IDLE)
             send_state(back_odrive, AXIS_STATE_IDLE)
         else:
-            middle_odrive.axis0.requested_state = CTRL_MODE_CURRENT_CONTROL
-            middle_odrive.axis1.requested_state = CTRL_MODE_CURRENT_CONTROL
-            front_odrive.axis0.requested_state = CTRL_MODE_CURRENT_CONTROL
-            front_odrive.axis1.requested_state = CTRL_MODE_CURRENT_CONTROL
-            back_odrive.axis0.requested_state = CTRL_MODE_CURRENT_CONTROL
-            back_odrive.axis1.requested_state = CTRL_MODE_CURRENT_CONTROL
+            front_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+            front_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+            middle_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+            middle_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+            back_odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+            back_odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+            middle_odrive.axis0.controller.config.control_mode = CTRL_MODE_CURRENT_CONTROL
+            middle_odrive.axis1.controller.config.control_mode = CTRL_MODE_CURRENT_CONTROL
+            front_odrive.axis0.controller.config.control_mode = CTRL_MODE_CURRENT_CONTROL
+            front_odrive.axis1.controller.config.control_mode = CTRL_MODE_CURRENT_CONTROL
+            back_odrive.axis0.controller.config.control_mode = CTRL_MODE_CURRENT_CONTROL
+            back_odrive.axis1.controller.config.control_mode = CTRL_MODE_CURRENT_CONTROL
             
             if(msg['power_mid']):
-                current_distribution = [0,0,.4,.4,.1,.1]
-                front_odrive.axis0.requested_state = AXIS_STATE_IDLE
-                front_odrive.axis1.requested_state = AXIS_STATE_IDLE
-            else if(msg['power_back']):
-                current_distribution = [.05,.05,.15,.15,.3,.3]
-            else if(msg['turn']):
-                current_distribution = [.1,.1,.3,.3,.1,.1]
+                current_distribution = [.03,.15,.03,.45,.3,.03] 
+#current_distribution = [.075,.075,.35,.35,.075,.075]
+            elif(msg['power_back']):
+                current_distribution = [.15,.15,.15,.15,.2,.2]
+            elif(msg['turn']):
+                current_distribution = [.15,.03,.45,.03,.03,.3]
             else:
                 current_distribution = [.16,.16,.16,.16,.16,.16]
             
-            alloted_current = total_current * current_distribution
+            alloted_current = [total_current*temp for temp in current_distribution]
             
             if(abs(msg['f'])+abs(msg['t']) > 1):
                 scaling_factor = abs(msg['f'])+abs(msg['t'])
                 msg['f'] = msg['f']/scaling_factor
                 msg['t'] = msg['t']/scaling_factor
-            
-            front_odrive.axis0.controller.vel_setpoint = alloted_current[0]*(-msg['f'] - msg['t'])
-            front_odrive.axis1.controller.vel_setpoint = -alloted_current[1]*(-msg['f'] + msg['t'])
-            middle_odrive.axis0.controller.vel_setpoint = alloted_current[2]*(msg['f'] + msg['t'])
-            middle_odrive.axis1.controller.vel_setpoint = alloted_current[3]*(msg['f'] - msg['t'])
+            print(alloted_current[0]*(-msg['f'] - msg['t']))
+            front_odrive.axis0.controller.current_setpoint = -alloted_current[0]*(-msg['f'] - msg['t'])
+            front_odrive.axis1.controller.current_setpoint = alloted_current[1]*(-msg['f'] + msg['t'])
+            middle_odrive.axis0.controller.current_setpoint = -alloted_current[2]*(msg['f'] + msg['t'])
+            middle_odrive.axis1.controller.current_setpoint = -alloted_current[3]*(msg['f'] - msg['t'])
 
             # back odrive is reversed left to right
-            back_odrive.axis1.controller.vel_setpoint = alloted_current[4]*(msg['f'] - msg['t'])
-            back_odrive.axis0.controller.vel_setpoint = -alloted_current[5]*(msg['f'] + msg['t'])
+            back_odrive.axis1.controller.current_setpoint = -alloted_current[4]*(msg['f'] - msg['t'])
+            back_odrive.axis0.controller.current_setpoint = alloted_current[5]*(msg['f'] + msg['t'])
 
     except timeout:
         print("Sending safe command")
