@@ -55,65 +55,65 @@ def get_data(odrive):
                 odrive.axis0.motor.current_control.Iq_measured,
                 odrive.axis1.motor.current_control.Iq_measured]
 
+def atomic_print(s):
+    print(str(s)+'\n',end='')
 
-def run_odrive(name, serial_number, directions):
+
+def run_odrive(name, serial_number, d):
     # USBLock.acquire()
-    print("looking for "+name+" odrive")
+    atomic_print("looking for "+name+" odrive")
     odrive = odrive.find_any(serial_number=serial_number)
-    print("found " +name+ " odrive")
+    atomic_print("found " +name+ " odrive")
     send_state(odrive, AXIS_STATE_IDLE)
     # USBLock.release()
 
     while True:
         try:
+            UDPLock.acquire()
             msg = cmd.get()
-            print(msg)
+            UDPLock.release()
+            atomic_print(msg)
             clear_errors(odrive)
 
             if (msg['t'] == 0 and msg['f'] == 0):
                 send_state(odrive, AXIS_STATE_IDLE)
             else:
                 send_state(odrive, AXIS_STATE_CLOSED_LOOP_CONTROL)
-                odrive.axis0.controller.vel_setpoint =  -msg['f'] - msg['t'] 
-                odrive.axis1.controller.vel_setpoint =   msg['f'] - msg['t']
+                odrive.axis0.controller.vel_setpoint =  d[0]*msg['f'] +d[1]*msg['t'] 
+                odrive.axis1.controller.vel_setpoint =  d[2]*msg['f'] +d[3]*msg['t']
                 odrive.axis0.watchdog_feed()
                 odrive.axis1.watchdog_feed()
 
         except timeout:
-            print("Sending safe command")
+            atomic_print("Sending safe command")
             send_state(odrive, AXIS_STATE_IDLE)
             odrive.axis0.controller.vel_setpoint = 0
             odrive.axis1.controller.vel_setpoint = 0
         except AttributeError:
-            print("Lost contact with "+name+" odrive!")
+            atomic_print("Lost contact with "+name+" odrive!")
             odrive = odrive.find_any(serial_number=serial_number)
-            print("found " + name + " odrive")
+            atomic_print("found " + name + " odrive")
 
         except:
-            print("shutting down "+ name)
+            atomic_print("shutting down "+ name)
             send_state(drive, AXIS_STATE_IDLE)
             odrive.axis0.controller.vel_setpoint = 0
             odrive.axis1.controller.vel_setpoint = 0
             raise
+        finally:
+            atomic_print("Exiting and Sending safe command")
+            send_state(odrive, AXIS_STATE_IDLE)
+            odrive.axis0.controller.vel_setpoint = 0
+            odrive.axis1.controller.vel_setpoint = 0
 
 if __name__ == "__main__"
-    USBLock = threading.Lock()
-    d = threading.Thread(target=run_odrive, arg=x daemon=True,
+    # USBLock = threading.Lock()
+    UDPLock = threading.Lock()
+    for odrive in odrives:
+        thread = threading.Thread(target=run_odrive, arg=odrive daemon=True)
+        thread.start()
 
-while True:
-    try:
-        msg = cmd.get()
-        print(msg)
-
-#    finally:
-#        print("Fianlly shutting down")
-#        send_state(front_odrive, AXIS_STATE_IDLE)
-#        send_state(middle_odrive, AXIS_STATE_IDLE)
-#        send_state(back_odrive, AXIS_STATE_IDLE)
-#        middle_odrive.axis0.controller.vel_setpoint = 0
-#        middle_odrive.axis1.controller.vel_setpoint = 0
-#        front_odrive.axis0.controller.vel_setpoint = 0
-#        front_odrive.axis1.controller.vel_setpoint = 0
-#        back_odrive.axis0.controller.vel_setpoint = 0
-#        back_odrive.axis1.controller.vel_setpoint = 0
-
+    # if any thread shuts down (which it shouldn't) we exit the program
+    # which exits all other threads to 
+    while threading.active_count() == 4:
+        pass
