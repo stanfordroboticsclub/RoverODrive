@@ -113,6 +113,8 @@ while True:
             front_odrive.axis1.watchdog_feed()
             middle_odrive.axis0.watchdog_feed()
             middle_odrive.axis1.watchdog_feed()
+            back_odrive.axis0.watchdog_feed()
+            back_odrive.axis1.watchdog_feed()
 
             # back odrive is reversed left to right
             back_odrive.axis0.controller.vel_setpoint =  -msg['f'] - msg['t'] 
