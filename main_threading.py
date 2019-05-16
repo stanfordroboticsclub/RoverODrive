@@ -6,16 +6,13 @@ from UDPComms import Subscriber, Publisher, timeout
 import time
 
 import os
+import threading
+
 if os.geteuid() != 0:
     exit("You need to have root privileges to run this script.\nPlease try again, this time using 'sudo'. Exiting.")
 
 cmd = Subscriber(8830, timeout = 0.3)
 telemetry = Publisher(8810)
-
-
-# serial_numbers = ["206C35733948", #front
-#                   "206230804648", #middle
-#                   "207D35903948"] #back
 
 odrives = [ ['front' , "206C35733948", [-1, -1, 1, -1]],
             ['middle', "206230804648", [ 1,  1, 1, -1][]],
@@ -60,11 +57,13 @@ def get_data(odrive):
 
 
 def run_odrive(name, serial_number, directions):
+    # USBLock.acquire()
     print("looking for "+name+" odrive")
     odrive = odrive.find_any(serial_number=serial_number)
     print("found " +name+ " odrive")
-
     send_state(odrive, AXIS_STATE_IDLE)
+    # USBLock.release()
+
     while True:
         try:
             msg = cmd.get()
@@ -74,8 +73,7 @@ def run_odrive(name, serial_number, directions):
             if (msg['t'] == 0 and msg['f'] == 0):
                 send_state(odrive, AXIS_STATE_IDLE)
             else:
-                odrive.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-                odrive.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+                send_state(odrive, AXIS_STATE_CLOSED_LOOP_CONTROL)
                 odrive.axis0.controller.vel_setpoint =  -msg['f'] - msg['t'] 
                 odrive.axis1.controller.vel_setpoint =   msg['f'] - msg['t']
                 odrive.axis0.watchdog_feed()
@@ -86,18 +84,21 @@ def run_odrive(name, serial_number, directions):
             send_state(odrive, AXIS_STATE_IDLE)
             odrive.axis0.controller.vel_setpoint = 0
             odrive.axis1.controller.vel_setpoint = 0
-        except AttributeErro:
+        except AttributeError:
             print("Lost contact with "+name+" odrive!")
             odrive = odrive.find_any(serial_number=serial_number)
             print("found " + name + " odrive")
 
-    send_state(odrive, AXIS_STATE_IDLE)
         except:
             print("shutting down "+ name)
             send_state(drive, AXIS_STATE_IDLE)
             odrive.axis0.controller.vel_setpoint = 0
             odrive.axis1.controller.vel_setpoint = 0
             raise
+
+if __name__ == "__main__"
+    USBLock = threading.Lock()
+    d = threading.Thread(target=run_odrive, arg=x daemon=True,
 
 while True:
     try:
