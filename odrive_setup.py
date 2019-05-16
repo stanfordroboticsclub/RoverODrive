@@ -140,6 +140,13 @@ odrv0.axis1.encoder.config.pre_calibrated = True
 odrv0.axis0.motor.config.current_lim = 25
 odrv0.axis1.motor.config.current_lim = 25
 
+try:
+    odrv0.axis0.config.watchdog_timeout = 0.5
+    odrv0.axis1.config.watchdog_timeout = 0.5
+except AttributeError:
+    print("WARNING WATCHDOG TIMEOUT NOT SUPPORTED!")
+
+
 odrv0.save_configuration()
 
 time.sleep(3)
