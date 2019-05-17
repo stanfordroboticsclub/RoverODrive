@@ -2,7 +2,7 @@
 Description=Pub: 8830 - target vel; Pub - 8810 drivebase telemetry
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/RoverODrive/main.py
+ExecStart=/usr/bin/python3 /home/pi/RoverODrive/main_threading.py
 StandardOutput=syslog
 Restart=always
 RestartSec=5
