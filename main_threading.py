@@ -74,22 +74,24 @@ def run_odrive(name, serial_number, d):
     try:
         while True:
             # read from USB Block
+            lostConnection = True
             try:
                 UDPLock.acquire()
                 atomic_print("Aqquired "+name)
                 msg = cmd.get()
-            except timeout:
-                atomic_print("Sending safe command")
-                msg = {"f":0, "t":0}
-            finally:
                 atomic_print(msg)
+                lostConnection = False
+            except timeout:
+                lostConnection = True
+            finally:
                 UDPLock.release()
                 atomic_print("Relesed "+name)
 
             # Write to Odrives block
             try:
                 clear_errors(odv)
-                if (msg['t'] == 0 and msg['f'] == 0):
+                if lostConnection:
+                    atomic_print("Timeout sending safe")
                     send_state(odv, AXIS_STATE_IDLE)
                 else:
                     send_state(odv, AXIS_STATE_CLOSED_LOOP_CONTROL)
@@ -101,7 +103,7 @@ def run_odrive(name, serial_number, d):
             except (USBError, ChannelBrokenException) as e:
                 atomic_print("Lost contact with "+name+" odrive!")
                 odv = odrive.find_any(serial_number=serial_number)
-                atomic_print("found " + name + " odrive")
+                atomic_print("refound " + name + " odrive")
 
     finally:
         atomic_print("Exiting and Sending safe command")
