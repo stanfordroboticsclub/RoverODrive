@@ -100,6 +100,8 @@ def run_odrive(name, serial_number, d):
                     odv.axis0.watchdog_feed()
                     odv.axis1.watchdog_feed()
 
+                tele[name] = get_data(odv)
+
             except (USBError, ChannelBrokenException) as e:
                 atomic_print("Lost contact with "+name+" odrive!")
                 odv = odrive.find_any(serial_number=serial_number)
@@ -114,6 +116,7 @@ def run_odrive(name, serial_number, d):
 if __name__ == "__main__":
     UDPLock = threading.Lock()
     threads = []
+    tele = {}
     for odv in odrives:
         atomic_print("starting "+str(odv))
         thread = threading.Thread(target=run_odrive, args=odv, daemon=True)
@@ -125,3 +128,4 @@ if __name__ == "__main__":
     while all(t.is_alive() for t in threads):
         time.sleep(1)
         atomic_print(str(list( o[0] + str(t.is_alive()) for t,o in zip(threads,odrives))))
+        telemetry.send(tele)
