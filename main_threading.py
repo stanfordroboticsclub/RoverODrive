@@ -110,15 +110,16 @@ def run_odrive(name, serial_number, d):
         odv.axis1.controller.vel_setpoint = 0
 
 if __name__ == "__main__":
-    # USBLock = threading.Lock()
     UDPLock = threading.Lock()
+    threads = []
     for odv in odrives:
         atomic_print("starting "+str(odv))
         thread = threading.Thread(target=run_odrive, args=odv, daemon=True)
         thread.start()
+        threads.append(thread)
 
     # if any thread shuts down (which it shouldn't) we exit the program
     # which exits all other threads to 
-    while 1:
+    while all(t.is_alive() for t in threads):
         time.sleep(1)
-        atomic_print(threading.active_count())
+        atomic_print(str(list( o[0] + str(t.is_alive()) for t,o in zip(threads,odrives))))
