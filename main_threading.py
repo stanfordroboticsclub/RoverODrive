@@ -64,12 +64,10 @@ def atomic_print(s):
 
 
 def run_odrive(name, serial_number, d):
-    # USBLock.acquire()
     atomic_print("looking for "+name+" odrive")
     odv = odrive.find_any(serial_number=serial_number)
     atomic_print("found " +name+ " odrive")
     send_state(odv, AXIS_STATE_IDLE)
-    # USBLock.release()
 
     try:
         while True:
@@ -77,7 +75,6 @@ def run_odrive(name, serial_number, d):
             lostConnection = True
             try:
                 UDPLock.acquire()
-                atomic_print("Aqquired "+name)
                 msg = cmd.get()
                 atomic_print(msg)
                 lostConnection = False
@@ -85,7 +82,6 @@ def run_odrive(name, serial_number, d):
                 lostConnection = True
             finally:
                 UDPLock.release()
-                atomic_print("Relesed "+name)
 
             # Write to Odrives block
             try:
