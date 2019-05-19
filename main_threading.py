@@ -18,7 +18,7 @@ if os.geteuid() != 0:
 cmd = Subscriber(8830, timeout = 0.3)
 telemetry = Publisher(8810)
 
-odrives = [ ['front' , "206C35733948", [-1, -1, 1, -1]],
+odrives = [ ['front' , "207B37813548", [-1, -1, 1, -1]],
             ['middle', "206230804648", [ 1,  1, 1, -1]],
             ['back'  , "207D35903948", [-1, -1, 1, -1]] ]
 
@@ -86,7 +86,8 @@ def run_odrive(name, serial_number, d):
             # Write to Odrives block
             try:
                 clear_errors(odv)
-                if lostConnection:
+                # if lostConnection:
+                if msg['f'] == 0 and msg['t'] == 0:
                     atomic_print("Timeout sending safe")
                     send_state(odv, AXIS_STATE_IDLE)
                 else:
