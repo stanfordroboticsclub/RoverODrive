@@ -80,6 +80,7 @@ def run_odrive(name, serial_number, d):
                 lostConnection = False
             except timeout:
                 lostConnection = True
+                msg = {'t':0, 'f':0}
             finally:
                 UDPLock.release()
 
