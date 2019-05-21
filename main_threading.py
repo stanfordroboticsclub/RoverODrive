@@ -87,8 +87,8 @@ def run_odrive(name, serial_number, d):
             # Write to Odrives block
             try:
                 clear_errors(odv)
-                # if lostConnection:
-                if msg['f'] == 0 and msg['t'] == 0:
+                if lostConnection:
+                # if msg['f'] == 0 and msg['t'] == 0:
                     atomic_print("Timeout sending safe")
                     send_state(odv, AXIS_STATE_IDLE)
                 else:
