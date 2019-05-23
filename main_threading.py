@@ -18,9 +18,9 @@ if os.geteuid() != 0:
 cmd = Subscriber(8830, timeout = 0.3)
 telemetry = Publisher(8810)
 
-odrives = [ ['front' , "207B37813548", [-1, -1, 1, -1]],
-            ['middle', "206230804648", [ 1,  1, 1, -1]],
-            ['back'  , "207D35903948", [-1, -1, 1, -1]] ]
+odrives = [ ['front' , "207B37883548", [-1, -1, 1, -1]],
+            ['middle', "207D37A33548", [ 1,  1, 1, -1]],
+            ['back'  , "207B37813548", [-1, -1, 1, -1]] ]
 
 def clear_errors(odv):
     if odv.axis0.error:
