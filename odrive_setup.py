@@ -37,6 +37,11 @@ time.sleep(1)
 
 
 odrv0.erase_configuration()
+
+## bug doesn't get erased?
+odrv0.axis0.config.watchdog_timeout = 0
+odrv0.axis1.config.watchdog_timeout = 0
+
 odrv0.save_configuration()
 
 time.sleep(2)
@@ -73,7 +78,7 @@ try:
 except AttributeError:
     pass
 
-odrv0.axis0.encoder.config.mode = 1
+odrv0.axis0.encoder.config.mode = ENCODER_MODE_HALL
 odrv0.axis0.encoder.config.cpr = 90
 
 try:
@@ -96,7 +101,7 @@ try:
 except AttributeError:
     pass
 
-odrv0.axis1.encoder.config.mode = 1
+odrv0.axis1.encoder.config.mode = ENCODER_MODE_HALL
 odrv0.axis1.encoder.config.cpr = 90
 
 try:
@@ -109,32 +114,42 @@ odrv0.axis1.controller.config.vel_integrator_gain = 0.1
 odrv0.axis1.controller.config.vel_limit = 1000
 odrv0.axis1.controller.config.control_mode = CTRL_MODE_VELOCITY_CONTROL
 
+# odrv0.axis0.config.watchdog_timeout = 0
+# odrv0.axis1.config.watchdog_timeout = 0
+print('watchdog', odrv0.axis0.config.watchdog_timeout)
+print('watchdog', odrv0.axis1.config.watchdog_timeout)
 
 # axis 0
 print("Motor 0")
 odrv0.axis0.requested_state = AXIS_STATE_MOTOR_CALIBRATION
 time.sleep(10)
+print (odrv0.axis0.motor.is_calibrated)
 assert odrv0.axis0.motor.error == 0, odrv0.axis0.motor.error
 odrv0.axis0.motor.config.pre_calibrated = True
 
 print("Encoder 0")
 odrv0.axis0.requested_state = AXIS_STATE_ENCODER_OFFSET_CALIBRATION
 time.sleep(10)
+print (odrv0.axis0.encoder.is_ready)
 assert odrv0.axis0.encoder.error == 0, odrv0.axis0.encoder.error
 odrv0.axis0.encoder.config.pre_calibrated = True
+assert odrv0.axis1.error == 0, odrv0.axis1.error
 
 # axis 1
 print("Motor 1")
 odrv0.axis1.requested_state = AXIS_STATE_MOTOR_CALIBRATION
 time.sleep(10)
+print (odrv0.axis1.motor.is_calibrated)
 assert odrv0.axis1.motor.error == 0, odrv0.axis1.motor.error
 odrv0.axis1.motor.config.pre_calibrated = True
 
 print("Encoder 1")
 odrv0.axis1.requested_state = AXIS_STATE_ENCODER_OFFSET_CALIBRATION
 time.sleep(10)
+print (odrv0.axis1.encoder.is_ready)
 assert odrv0.axis1.encoder.error == 0, odrv0.axis1.encoder.error
 odrv0.axis1.encoder.config.pre_calibrated = True
+assert odrv0.axis1.error == 0, odrv0.axis1.error
 
 # still looking for good values
 odrv0.axis0.motor.config.current_lim = 25
