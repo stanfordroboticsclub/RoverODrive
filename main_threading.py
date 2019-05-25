@@ -18,9 +18,10 @@ if os.geteuid() != 0:
 cmd = Subscriber(8830, timeout = 0.3)
 telemetry = Publisher(8810)
 
-odrives = [ ['middle' , "207B37883548", [-1, -1, 1, -1]],
-            ['front', "207D37A33548", [ 1,  1, 1, -1]],
-            ['back'  , "207B37813548", [-1, -1, 1, -1]] ]
+# motor 0 is right
+odrives = [ ['middle' , "207B37883548", [1, 1]],
+            ['front', "207D37A33548", [ -1,  1]],
+            ['back'  , "207B37813548", [-1, -1]] ]#second is ?
 
 def clear_errors(odv):
     if odv.axis0.error:
@@ -93,8 +94,12 @@ def run_odrive(name, serial_number, d):
                     send_state(odv, AXIS_STATE_IDLE)
                 else:
                     send_state(odv, AXIS_STATE_CLOSED_LOOP_CONTROL)
-                    odv.axis0.controller.vel_setpoint =  d[0]*msg['f'] +d[1]*msg['t'] 
-                    odv.axis1.controller.vel_setpoint =  d[2]*msg['f'] +d[3]*msg['t']
+                    # axis 0 (right) is always same sign
+                    # axis 1 (left) is always opposite sign
+                    odv.axis0.controller.vel_setpoint =  d[0]*( \
+                                msg['f'] + msg['t'])
+                    odv.axis1.controller.vel_setpoint =  d[1]*( \
+                                msg['f'] - msg['t'])
                     odv.axis0.watchdog_feed()
                     odv.axis1.watchdog_feed()
 
