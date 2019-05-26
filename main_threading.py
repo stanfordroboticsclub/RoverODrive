@@ -19,9 +19,10 @@ cmd = Subscriber(8830, timeout = 0.3)
 telemetry = Publisher(8810)
 
 # motor 0 is right
+# motor 1 is left
 odrives = [ ['middle' , "207B37883548", [1, 1]],
-            ['front', "207D37A33548", [ -1,  1]],
-            ['back'  , "207B37813548", [-1, -1]] ]#second is ?
+            ['front', "207D37A33548",  [-1, 1]],
+            ['back'  , "207B37813548", [-1, 1]]]
 
 def clear_errors(odv):
     if odv.axis0.error:
