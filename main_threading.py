@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 import odrive
+from odrive.utils import dump_errors
 from odrive.enums import *
 from fibre.protocol import ChannelBrokenException
 from usb.core import USBError
 
 from UDPComms import Subscriber, Publisher, timeout
-import time
 
 import os
 import threading
 import time
+import io
+from contextlib import redirect_stdout
 
 
 if os.geteuid() != 0:
@@ -24,27 +26,11 @@ odrives = [ ['middle', "208D358D524B", [-1, 1]],
             ['front' , "2092358D524B", [-1, 1]],
             ['back'  , "2092357A524B", [-1, 1]]]
 
-def clear_errors(odv):
-    if odv.axis0.error:
-        print("axis 0", odv.axis0.error)
-        odv.axis0.error = 0
-    if odv.axis1.error:
-        print("axis 1", odv.axis1.error)
-        odv.axis1.error = 0
-
-    if odv.axis0.motor.error:
-        print("motor 0", odv.axis0.motor.error)
-        odv.axis0.motor.error = 0
-    if odv.axis1.motor.error:
-        print("motor 1", odv.axis1.motor.error)
-        odv.axis1.motor.error = 0
-
-    if odv.axis0.encoder.error:
-        print("encoder 0", odv.axis0.encoder.error)
-        odv.axis0.encoder.error = 0
-    if odv.axis1.encoder.error:
-        print("encoder 1", odv.axis1.encoder.error)
-        odv.axis1.encoder.error = 0
+def clear_errors(name, odv):
+    if odv.axis0.error or odv.axis1.error:
+        with PrintLock:
+            print("Errors on", name)
+            dump_errors(odv, True)
 
 def send_state(odv, state):
         try:
@@ -88,7 +74,7 @@ def run_odrive(name, serial_number, d):
 
             # Write to Odrives block
             try:
-                clear_errors(odv)
+                clear_errors(name, odv)
                 if lostConnection:
                 # if msg['f'] == 0 and msg['t'] == 0:
                     atomic_print("Timeout sending safe")
@@ -118,7 +104,8 @@ def run_odrive(name, serial_number, d):
         odv.axis1.controller.vel_setpoint = 0
 
 if __name__ == "__main__":
-    UDPLock = threading.Lock()
+    UDPLock   = threading.Lock()
+    PrintLock = threading.Lock()
     threads = []
     tele = {}
     for odv in odrives:
