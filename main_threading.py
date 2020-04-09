@@ -142,6 +142,6 @@ if __name__ == "__main__":
     # if any thread shuts down (which it shouldn't) we exit the program
     # which exits all other threads to 
     while all(t.is_alive() for t in threads):
-        time.sleep(1)
+        time.sleep(0.1)
         atomic_print(str(list( o[0] + str(t.is_alive()) for t,o in zip(threads,odrives))))
         telemetry.send(tele)
