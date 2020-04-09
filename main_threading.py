@@ -5,11 +5,11 @@ from fibre.protocol import ChannelBrokenException
 from usb.core import USBError
 
 from UDPComms import Subscriber, Publisher, timeout
-import time
 
 import os
 import threading
 import time
+import math
 
 
 if os.geteuid() != 0:
@@ -55,9 +55,23 @@ def send_state(odv, state):
             pass
 
 def get_data(odv):
-        return [odv.vbus_voltage,
-                odv.axis0.motor.current_control.Iq_measured,
-                odv.axis1.motor.current_control.Iq_measured]
+        WHEEL_RAD = 6.5 * 25.4 /2
+        WHEEL_BASE = 18 * 25.4
+
+        rev0 = -odv.axis0.encoder.vel_estimate / odv.axis0.encoder.config.cpr
+        rev1 =  odv.axis1.encoder.vel_estimate / odv.axis1.encoder.config.cpr
+
+        dist0 = 2 * math.pi * WHEEL_RAD * rev0
+        dist1 = 2 * math.pi * WHEEL_RAD * rev1
+
+        #motor 0 is right
+        dx =  (dist0 + dist1)/2
+        da = (dist0 - dist1)/WHEEL_BASE
+
+        return {"vbus":odv.vbus_voltage,
+                "cur": [odv.axis0.motor.current_control.Iq_measured,
+                odv.axis1.motor.current_control.Iq_measured],
+                "odom": [da,dx] }
 
 def atomic_print(s):
     print(str(s)+'\n',end='')
