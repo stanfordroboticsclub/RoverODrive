@@ -66,7 +66,7 @@ def get_data(odv):
 
         #motor 0 is right
         dx =  (dist0 + dist1)/2
-        da = (dist0 - dist1)/WHEEL_BASE
+        da = (dist1 - dist0)/WHEEL_BASE
 
         return {"vbus":odv.vbus_voltage,
                 "cur": [odv.axis0.motor.current_control.Iq_measured,
